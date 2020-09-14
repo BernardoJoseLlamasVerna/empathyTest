@@ -1,0 +1,108 @@
+openapi: 3.0.0
+info:
+  title: Marmitakoo
+  description: Marmitakoo API
+  version: 0.0.1
+
+paths:
+  /feed/products:
+    get:
+      tags:
+        - "Feed"
+      summary: "Find documents"
+      description: "This endpoint will export the PrestaShop products"
+      operationId: "search"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsResponse'
+        "400":
+          description: "Bad Request"
+
+components:
+  schemas:
+    ProductsResponse:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductObject'
+          minItems: 10
+          maxItems: 50
+          uniqueItems: true
+
+    ProductObject:
+      type: object
+      properties:
+        id:
+          type: string
+          x-faker: random.uuid
+        name:
+          type: string
+          x-faker: commerce.productName
+        description:
+          type: string
+          x-faker: lorem.paragraph
+        link:
+          type: string
+          x-faker: internet.url
+        image:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageObject'
+        availability:
+          type: object
+          properties:
+            stock:
+              type: integer
+              format: int32
+              minimum: -10
+              maximum: 100
+        price:
+          type: object
+          properties:
+            regular:
+              type: number
+              minimum: 10
+              maximum: 100
+            on_sale:
+              type: number
+              minimum: 10
+              maximum: 100
+        variations:
+          type: array
+          items:
+            properties:
+              id:
+                type: string
+                x-faker: random.uuid
+              color:
+                type: string
+                x-faker: commerce.color
+              material:
+                type: string
+                x-faker: commerce.productMaterial
+              updatedAt:
+                type: string
+                x-faker: date.recent
+
+          minItems: 0
+          maxItems: 5
+          uniqueItems: true
+        updatedAt:
+          type: string
+          x-faker: date.recent
+
+    ImageObject:
+      type: object
+      properties:
+        url:
+          type: string
+          x-faker: image.imageUrl
+        alt:
+          type: string
+          x-faker: lorem.sentence
