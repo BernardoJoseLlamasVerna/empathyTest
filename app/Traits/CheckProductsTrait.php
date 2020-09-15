@@ -23,25 +23,37 @@ trait CheckProductsTrait
 
             // check variations: if same color-material exported, discard old versions and take more recent:
             $colorMaterialCombination = [];
-            foreach ($product['variations'] as $variation) {
-                $key = $variation['material'].$variation['color'];
-                if (!array_key_exists($key, $colorMaterialCombination)
-                    || $this->isMoreRecent($variation, $colorMaterialCombination[$key]))
-                {
-
-                    $variation['updatedAt'] = $this->reformatDate($variation['updatedAt'])->toISOString();
-                    $colorMaterialCombination[] = $variation;
-                }
-            }
-
-            $product['variations'] = $colorMaterialCombination;
-            // check variations: if same color-material exported, discard old versions and take more recent:
+            $product['variations'] = $this->checkColorMaterialCombinations(
+                $product['variations'],
+                $colorMaterialCombination
+            );
 
             $product['updatedAt'] = $this->reformatDate($product['updatedAt'])->toISOString();
             $productsAfterChecked['products'][] = $product;
         }
 
         return $productsAfterChecked;
+    }
+
+    /**
+     * Check variations of color-material associated to a product.
+     * @param $variations
+     * @param $colorMaterialCombination
+     * @return mixed
+     */
+    private function checkColorMaterialCombinations($variations, $colorMaterialCombination) {
+        foreach ($variations as $variation) {
+            $key = $variation['material'].$variation['color'];
+            if (!array_key_exists($key, $colorMaterialCombination)
+                || $this->isMoreRecent($variation, $colorMaterialCombination[$key]))
+            {
+
+                $variation['updatedAt'] = $this->reformatDate($variation['updatedAt'])->toISOString();
+                $colorMaterialCombination[] = $variation;
+            }
+        }
+
+        return $colorMaterialCombination;
     }
 
     /**
@@ -62,7 +74,7 @@ trait CheckProductsTrait
     }
 
     /**
-     * Convert updatedAt to the following format "2020-09-14T15:09:30.000000Z".
+     * Convert updatedAt to the following format i.e: "2020-09-14T15:09:30.000000Z".
      * @param $date
      * @return float|string
      */
