@@ -3,59 +3,49 @@
 namespace App\Http\Controllers;
 
 use App\Traits\CheckProductsTrait;
-use Illuminate\Http\Request;
 
 class AdsController extends Controller
 {
     use CheckProductsTrait;
 
+    /**
+     * Function that returns products advertisements
+     * @return string
+     */
     public function getAds()
     {
-        // dd("hellooo");
-
         $products = $this->getProductsChecked();
-
-        //$adsArray = [];
         $adsArray['advertisements'] = [];
-        /*$adsArray['advertisements']['enabled'] = [];
-        $adsArray['advertisements']['disabled'] = [];
-        dd($adsArray);*/
 
         foreach ($products['products'] as $product) {
-            //dd($product);
-
             // check product stock and if is enabled/disabled
             $results = $this->checkProductStock($product['availability']['stock']);
             $message = $results[0];
             $enabled = $results[1];
-            // check product stock and if is enabled/disabled
-
-            // calculate discounts:
+            //images array;
+            $images = $this->getAllImagesUrl($product['image']);
+            // calculate discount:
             $discount = $this->discountPercentage($product['price']);
-            // calculate discounts:
-
             // get all product colors and materials:
             $colorAndMaterials = $this->getAllColorsAndMaterials($product['variations']);
-
-            $colors = $colorAndMaterials[0];
-            $materials = $colorAndMaterials[1];
-            // get all product colors and materials:
-
             // final advertisement array
-            $advertiseInfo = $this->finalAdInfo($product, $discount, $message, $colorAndMaterials);
+            $advertiseInfo = $this->finalAdInfo($product, $images, $discount, $message, $colorAndMaterials);
 
             if($enabled) {
                 $adsArray['advertisements']['enabled'][] = $advertiseInfo;
             } else {
                 $adsArray['advertisements']['disabled'][] = $advertiseInfo;
             }
-            // final advertisement array
-
         }
 
-        dd($adsArray);
+        return \GuzzleHttp\json_encode($adsArray);
     }
 
+    /**
+     * Check product stock and return $message about product stock and boolean (enabled/disabled)
+     * @param $stock
+     * @return array
+     */
     private function checkProductStock($stock) {
         $message = '';
         $enabled = true;
@@ -64,22 +54,41 @@ class AdsController extends Controller
             $message = 'Out of Stock!';
             $enabled = false;
         }
-
-        if ($stock >= 0 && $stock < 10) {
+        if ($stock > 0 && $stock < 10) {
             $message = 'Last Units!';
         }
-
         if ($stock >= 10 && $stock < 50) {
             $message = 'Bestseller!';
         }
-
-        if ($stock >= 50 && $stock < 80) {
+        if ($stock > 80) {
             $message = 'New Product!';
         }
 
         return [$message, $enabled];
     }
 
+    /**
+     * Function that returns inside one array all images url associated to a product.
+     * @param $images
+     * @return array
+     */
+    private function getAllImagesUrl($images) {
+        $imagesFinalArray = [];
+
+        foreach ($images as $image) {
+            if($this->checkIfIsInArray($image['url'], $imagesFinalArray)) {
+                $imagesFinalArray[] = $image['url'];
+            }
+        }
+
+        return $imagesFinalArray;
+    }
+
+    /**
+     * Function that returns product discount percentage from regular and on_sale prices.
+     * @param $price
+     * @return string
+     */
     private function discountPercentage($price) {
         $regularPrice = $price['regular'];
         $onSalePrice = $price['on_sale'];
@@ -87,26 +96,53 @@ class AdsController extends Controller
         return round(($regularPrice - $onSalePrice)*100/$regularPrice, 2).'%';
     }
 
+    /**
+     * Function that returns two arrays with colors and materials associated from a product.
+     * @param $variations
+     * @return array[]
+     */
     private function getAllColorsAndMaterials($variations) {
         $colors = [];
         $materials = [];
 
         foreach ($variations as $variation) {
-            $colors[] = $variation['color'];
-            $materials[] = $variation['material'];
+            if($this->checkIfIsInArray($variation['color'], $colors)) {
+                $colors[] = $variation['color'];
+            }
+
+            if($this->checkIfIsInArray($variation['material'], $materials)) {
+                $materials[] = $variation['material'];
+            }
         }
 
-        //dd($materials);
         return [$colors, $materials];
     }
 
-    private function finalAdInfo($product, $discount, $message, $colorAndMaterials) {
+    /** Check if an element is in array. Return true if not.
+     * @param $element
+     * @param $array
+     * @return bool
+     */
+    private function checkIfIsInArray($element, $array) {
+        return !in_array($element, $array);
+    }
+
+    /**
+     * Function that returns final product advertisement info.
+     * @param $product
+     * @param $images
+     * @param $discount
+     * @param $message
+     * @param $colorAndMaterials
+     * @return array
+     */
+    private function finalAdInfo($product, $images, $discount, $message, $colorAndMaterials) {
         $finalAdInfo = [];
 
         $finalAdInfo['id'] = $product['id'];
         $finalAdInfo['name'] = $product['name'];
         $finalAdInfo['link'] = $product['link'];
-        $finalAdInfo['images'] = $product['image'];
+        $finalAdInfo['images'] = $images;
         $finalAdInfo['discount'] = $discount;
         $finalAdInfo['message'] = $message;
         $finalAdInfo['colors'] = $colorAndMaterials[0];
