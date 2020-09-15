@@ -71,16 +71,22 @@
                 </div>
 
                 <div class="links">
-                    Author: <a href="https://www.linkedin.com/in/bernardo-llamas-verna-55bb5343/">Bernardo Llamas Verna</a>
+                    Author: <a href="https://www.linkedin.com/in/bernardo-llamas-verna-55bb5343/" target="_blank">
+                        Bernardo Llamas Verna
+                    </a>
                 </div>
                 <br>
                 <div class="content m-b-md">
-                    Click here to display products:
-                    <a href="{{ url('/products') }}" class="btn btn-primary">Products</a>
+                    <p>Click here to display products:</p>
+                    <a href="{{ url('/products') }}" target="_blank" class="btn btn-primary">
+                        <button>Products</button>
+                    </a>
                 </div>
                 <div class="content m-b-md">
-                    Click here to display advertisements:
-                    <a href="{{ url('/advertisements') }}" class="btn btn-primary">Ads</a>
+                    <p>Click here to display advertisements:</p>
+                    <a href="{{ url('/advertisements') }}" target="_blank" class="btn btn-primary">
+                        <button>Ads</button>
+                    </a>
                 </div>
             </div>
         </div>
