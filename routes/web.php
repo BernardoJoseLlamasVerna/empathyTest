@@ -14,18 +14,8 @@ use App\Http\Controllers;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-/*Route::get('/products', function () {
-    $json = json_decode(file_get_contents("http://0.0.0.0:7000/feed/products"), true);
-    dd($json);
-});*/
-
+Route::get('/', function () { return view('welcome');});
 Route::get('/products', [Controllers\ProductsController::class, 'getProducts']);
-
 Route::get('/advertisements', [Controllers\AdsController::class, 'getAds']);
-// Route::get('/advertisements', [Controllers\ProductsController::class, 'getAds']);
 
 
