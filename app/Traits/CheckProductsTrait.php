@@ -19,7 +19,6 @@ trait CheckProductsTrait
                 $product['price']['regular'] = $onSalePrice;
                 $product['price']['on_sale'] = $regularPrice;
             }
-            // check on_sale value is always lower than regular price:
 
             // check variations: if same color-material exported, discard old versions and take more recent:
             $colorMaterialCombination = [];

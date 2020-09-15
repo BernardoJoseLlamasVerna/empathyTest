@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +14,7 @@ use App\Http\Controllers;
 */
 
 Route::get('/', function () { return view('welcome');});
-Route::get('/products', [Controllers\ProductsController::class, 'getProducts']);
-Route::get('/advertisements', [Controllers\AdsController::class, 'getAds']);
+Route::get('/products', 'ProductsController@getProducts');
+Route::get('/advertisements', 'AdsController@getAds');
 
 
