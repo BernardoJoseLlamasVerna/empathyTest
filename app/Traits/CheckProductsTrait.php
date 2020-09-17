@@ -16,6 +16,11 @@ trait CheckProductsTrait
      * @return array
      */
     public function getProductsChecked() {
+        // test /feed/products endpoint
+        if (!file_get_contents("http://0.0.0.0:7000/feed/products")) {
+            $error = error_get_last();
+            echo "HTTP request failed. Error was: " . $error['message'];
+        }
         // get products from url http://0.0.0.0:7000/feed/products:
         $products = json_decode(file_get_contents("http://0.0.0.0:7000/feed/products"), true);
 
