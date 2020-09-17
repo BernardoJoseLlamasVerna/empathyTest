@@ -71,7 +71,7 @@ trait CheckProductsTrait
     }
 
     /**
-     * Checks which product's color-material combination version is more recent.
+     * Checks which product's color-material version is more recent.
      *
      * @param $newVariation
      * @param $oldVariation

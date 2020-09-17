@@ -42,7 +42,7 @@ class AdsController extends Controller
     }
 
     /**
-     * Checks product stock and returns $message about product stock and boolean (enabled/disabled)
+     * Checks product stock and returns a message and boolean (enabled/disabled)
      * @param $stock
      * @return array
      */
