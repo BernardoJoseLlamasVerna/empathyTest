@@ -42,7 +42,7 @@ class AdsController extends Controller
     }
 
     /**
-     * Check product stock and return $message about product stock and boolean (enabled/disabled)
+     * Checks product stock and returns $message about product stock and boolean (enabled/disabled)
      * @param $stock
      * @return array
      */
@@ -68,7 +68,7 @@ class AdsController extends Controller
     }
 
     /**
-     * Function that returns inside one array all images url associated to a product.
+     * Function that returns all images url associated to a product.
      * @param $images
      * @return array
      */
@@ -97,7 +97,7 @@ class AdsController extends Controller
     }
 
     /**
-     * Function that returns two arrays with colors and materials associated from a product.
+     * Function that returns two arrays with all colors and materials associated to a product.
      * @param $variations
      * @return array[]
      */

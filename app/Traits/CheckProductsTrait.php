@@ -6,6 +6,15 @@ use Carbon\Carbon;
 
 trait CheckProductsTrait
 {
+    /**
+     * Function that gets all products from http://0.0.0.0:7000/feed/products endpoint.
+     *
+     * Two tests to each product are done:
+     * - fix regular and on_sale prices so regular price always has to be greater than on_sale price.
+     * - check variations of each product: if a color-material combination is repeated, old versions are discarded.
+     *
+     * @return array
+     */
     public function getProductsChecked() {
         // get products from url http://0.0.0.0:7000/feed/products:
         $products = json_decode(file_get_contents("http://0.0.0.0:7000/feed/products"), true);
@@ -20,14 +29,14 @@ trait CheckProductsTrait
                 $product['price']['on_sale'] = $regularPrice;
             }
 
-            // check variations: if same color-material exported, discard old versions and take more recent:
+            // check variations: if same color-material combination, discard old versions and take the recent one:
             $colorMaterialCombination = [];
             $product['variations'] = $this->checkColorMaterialCombinations(
                 $product['variations'],
                 $colorMaterialCombination
             );
 
-            $product['updatedAt'] = $this->reformatDate($product['updatedAt'])->toISOString();
+            $product['updatedAt'] = $this->reformatDate($product['updatedAt']);
             $productsAfterChecked['products'][] = $product;
         }
 
@@ -35,7 +44,9 @@ trait CheckProductsTrait
     }
 
     /**
-     * Check variations of color-material associated to a product.
+     * Checks combinations of color-material associated to a product.
+     *  - if color-material combination doesn't exist it's included on final $colorMaterialCombination array.
+     *  - if color-material combination exists, more recent is included on final $colorMaterialCombination array.
      * @param $variations
      * @param $colorMaterialCombination
      * @return mixed
@@ -46,8 +57,7 @@ trait CheckProductsTrait
             if (!array_key_exists($key, $colorMaterialCombination)
                 || $this->isMoreRecent($variation, $colorMaterialCombination[$key]))
             {
-
-                $variation['updatedAt'] = $this->reformatDate($variation['updatedAt'])->toISOString();
+                $variation['updatedAt'] = $this->reformatDate($variation['updatedAt']);
                 $colorMaterialCombination[] = $variation;
             }
         }
@@ -56,7 +66,7 @@ trait CheckProductsTrait
     }
 
     /**
-     * Check which product version is more recent.
+     * Checks which product's color-material combination version is more recent.
      *
      * @param $newVariation
      * @param $oldVariation
@@ -73,7 +83,7 @@ trait CheckProductsTrait
     }
 
     /**
-     * Convert updatedAt to the following format i.e: "2020-09-14T15:09:30.000000Z".
+     * Converts updatedAt date to the following format i.e: "2020-09-14T15:09:30.000000Z".
      * @param $date
      * @return float|string
      */
